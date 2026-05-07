@@ -20,11 +20,14 @@ function getWordsByLength(length) {
 }
 
 export default function App() {
+
   const [wordLength, setWordLength] = useState(5);
+
   const [showDifficultyMenu, setShowDifficultyMenu] =
     useState(false);
 
   const [theme, setTheme] = useState("");
+
   const [secretWord, setSecretWord] = useState("");
 
   const [guesses, setGuesses] = useState(
@@ -38,13 +41,29 @@ export default function App() {
 
   const [usedKeys, setUsedKeys] = useState({});
 
-  // AHORA GUARDA CELDA INDIVIDUAL
-  const [revealedCells, setRevealedCells] = useState([]);
-  const [flipCell, setFlipCell] = useState(null);
+  // FLIP
+  const [revealedCells, setRevealedCells] =
+    useState([]);
 
-  const [errorRow, setErrorRow] = useState(null);
+  const [flipCell, setFlipCell] =
+    useState(null);
+
+  // ERROR
+  const [errorRow, setErrorRow] =
+    useState(null);
+
+  // PISTAS
+  const [showHint, setShowHint] =
+    useState(false);
+
+  const [hintsUsed, setHintsUsed] =
+    useState(0);
+
+  const [revealedHintLetters, setRevealedHintLetters] =
+    useState([]);
 
   const keySoundRef = useRef(null);
+
   const enterSoundRef = useRef(null);
 
   // Palabras según dificultad
@@ -60,6 +79,7 @@ export default function App() {
   // Temas automáticos
   const WORDS_BY_THEME =
     wordsByLength.reduce((acc, item) => {
+
       if (!acc[item.category]) {
         acc[item.category] = [];
       }
@@ -67,10 +87,12 @@ export default function App() {
       acc[item.category].push(item.word);
 
       return acc;
+
     }, {});
 
   // Tema random
   function getRandomTheme() {
+
     const themes =
       Object.keys(WORDS_BY_THEME);
 
@@ -81,7 +103,9 @@ export default function App() {
 
   // Palabra random por tema
   function getWordByTheme(theme) {
-    const words = WORDS_BY_THEME[theme];
+
+    const words =
+      WORDS_BY_THEME[theme];
 
     return words[
       Math.floor(Math.random() * words.length)
@@ -90,6 +114,7 @@ export default function App() {
 
   // SONIDOS
   useEffect(() => {
+
     keySoundRef.current =
       new Audio("/sonidos/key.wav");
 
@@ -97,11 +122,14 @@ export default function App() {
       new Audio("/sonidos/enter.mp3");
 
     keySoundRef.current.volume = 1;
+
     enterSoundRef.current.volume = 1;
+
   }, []);
 
   // INICIAR JUEGO
   useEffect(() => {
+
     const themes =
       Object.keys(WORDS_BY_THEME);
 
@@ -121,18 +149,30 @@ export default function App() {
       ];
 
     setTheme(randomTheme);
+
     setSecretWord(randomWord);
 
     setGuesses(Array(MAX_ROWS).fill(""));
+
     setCurrentRow(0);
 
     setGameStatus("playing");
 
     setUsedKeys({});
+
+    setFlipCell(null);
+
+    setRevealedCells([]);
+
+    setHintsUsed(0);
+
+    setRevealedHintLetters([]);
+
   }, [wordLength]);
 
   // Sonidos
   const playSound = (type) => {
+
     const baseSound =
       type === "enter"
         ? enterSoundRef.current
@@ -151,6 +191,7 @@ export default function App() {
 
   // TECLADO FISICO
   useEffect(() => {
+
     const handleKey = (e) => {
       handleKeyPress(
         e.key.toUpperCase()
@@ -169,15 +210,63 @@ export default function App() {
       );
   });
 
+  // PISTA
+  function handleHint() {
+
+    if (hintsUsed >= 3) return;
+
+    const unrevealedIndexes = [];
+
+    for (let i = 0; i < secretWord.length; i++) {
+
+      const alreadyRevealed =
+        revealedHintLetters.some(
+          (item) => item.index === i
+        );
+
+      if (!alreadyRevealed) {
+        unrevealedIndexes.push(i);
+      }
+    }
+
+    if (unrevealedIndexes.length === 0) return;
+
+    const randomIndex =
+      unrevealedIndexes[
+        Math.floor(
+          Math.random() *
+          unrevealedIndexes.length
+        )
+      ];
+
+    const revealedLetter =
+      secretWord[randomIndex];
+
+    setRevealedHintLetters((prev) => [
+      ...prev,
+      {
+        index: randomIndex,
+        letter: revealedLetter,
+      },
+    ]);
+
+    setHintsUsed((prev) => prev + 1);
+
+    setShowHint(true);
+  }
+
   // TECLAS
   function handleKeyPress(key) {
+
     if (gameStatus !== "playing") return;
 
     // LETRAS
     if (/^[A-Z]$/.test(key)) {
+
       playSound("key");
 
       setGuesses((prev) => {
+
         const newGuesses = [...prev];
 
         if (
@@ -196,9 +285,11 @@ export default function App() {
       key === "BACKSPACE" ||
       key === "⌫"
     ) {
+
       playSound("key");
 
       setGuesses((prev) => {
+
         const newGuesses = [...prev];
 
         newGuesses[currentRow] =
@@ -210,6 +301,7 @@ export default function App() {
 
     // ENTER
     if (key === "ENTER") {
+
       const currentGuess =
         guesses[currentRow];
 
@@ -218,8 +310,9 @@ export default function App() {
       if (
         currentGuess.length !==
         wordLength
-      )
+      ) {
         return;
+      }
 
       // INVALIDA
       if (
@@ -227,6 +320,7 @@ export default function App() {
           currentGuess
         )
       ) {
+
         setErrorRow(currentRow);
 
         setTimeout(() => {
@@ -240,21 +334,25 @@ export default function App() {
 
       // FLIP LETRA POR LETRA
       currentGuess
-      .split("")
-      .forEach((_, i) => {
-        setTimeout(() => {
+        .split("")
+        .forEach((_, i) => {
 
-          setFlipCell(`${currentRow}-${i}`);
+          setTimeout(() => {
 
-          setRevealedCells(prev => [
-            ...prev,
-            `${currentRow}-${i}`
-          ]);
+            setFlipCell(
+              `${currentRow}-${i}`
+            );
 
-        }, i * 180);
-      });
+            setRevealedCells(prev => [
+              ...prev,
+              `${currentRow}-${i}`
+            ]);
+
+          }, i * 180);
+        });
 
       setTimeout(() => {
+
         const newUsed = {
           ...usedKeys,
         };
@@ -262,6 +360,7 @@ export default function App() {
         currentGuess
           .split("")
           .forEach((letter, i) => {
+
             const status =
               getLetterStatus(
                 letter,
@@ -271,18 +370,23 @@ export default function App() {
             if (
               status === "correct"
             ) {
+
               newUsed[letter] =
                 "correct";
+
             } else if (
               status === "present" &&
               newUsed[letter] !==
-                "correct"
+              "correct"
             ) {
+
               newUsed[letter] =
                 "present";
+
             } else if (
               !newUsed[letter]
             ) {
+
               newUsed[letter] =
                 "absent";
             }
@@ -294,7 +398,9 @@ export default function App() {
         if (
           currentGuess === secretWord
         ) {
+
           setGameStatus("won");
+
           return;
         }
 
@@ -303,13 +409,16 @@ export default function App() {
           currentRow ===
           MAX_ROWS - 1
         ) {
+
           setGameStatus("lost");
+
           return;
         }
 
         setCurrentRow((r) => r + 1);
 
         setFlipCell(null);
+
       }, wordLength * 250 + 300);
     }
   }
@@ -319,6 +428,7 @@ export default function App() {
     letter,
     index
   ) {
+
     if (!letter) return "";
 
     if (
@@ -338,6 +448,7 @@ export default function App() {
 
   // RESET
   function resetGame() {
+
     const randomTheme =
       getRandomTheme();
 
@@ -359,18 +470,42 @@ export default function App() {
     setFlipCell(null);
 
     setRevealedCells([]);
+
+    setHintsUsed(0);
+
+    setRevealedHintLetters([]);
+
+    setShowHint(false);
   }
 
   if (!secretWord) return null;
 
   return (
+
     <div className="app">
 
       {/* TOP BAR */}
       <div className="top-bar">
 
+        {/* PISTAS */}
+        <div className="hint-container">
+
+          <button
+            className="hint-button"
+            onClick={handleHint}
+          >
+            💡 Obtener pista
+          </button>
+
+          <span className="hint-count">
+            {hintsUsed}/3
+          </span>
+
+        </div>
+
         <h1>VerBoX</h1>
 
+        {/* DIFICULTAD */}
         <div className="difficulty-container">
 
           <button
@@ -385,6 +520,7 @@ export default function App() {
           </button>
 
           {showDifficultyMenu && (
+
             <div className="difficulty-menu">
 
               <button
@@ -447,6 +583,7 @@ export default function App() {
                 guess[colIndex];
 
               return (
+
                 <div
                   key={colIndex}
                   className={`cell ${
@@ -479,8 +616,81 @@ export default function App() {
         usedKeys={usedKeys}
       />
 
-      {/* MODAL */}
+      {/* MODAL PISTA */}
+      {showHint && (
+
+        <div className="hint-modal-overlay">
+
+          <div className="hint-modal">
+
+            <h3>💡 Pista</h3>
+
+            <div className="hint-board">
+
+              {Array.from({
+                length: wordLength,
+              }).map((_, index) => {
+
+                const lastGuess =
+                  guesses[currentRow] ||
+                  guesses[currentRow - 1] ||
+                  "";
+
+                const letter =
+                  lastGuess[index];
+
+                return (
+
+                  <div
+                    key={index}
+                    className={`cell hint-cell ${
+                      getLetterStatus(
+                        letter,
+                        index
+                      )
+                    }`}
+                  >
+                    {letter || ""}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="revealed-letters">
+
+              {revealedHintLetters.map(
+                (item, index) => (
+
+                  <div
+                    key={index}
+                    className="revealed-letter"
+                  >
+                    Letra {item.index + 1}:
+                    <strong>
+                      {" "}
+                      {item.letter}
+                    </strong>
+                  </div>
+                )
+              )}
+
+            </div>
+
+            <button
+              onClick={() =>
+                setShowHint(false)
+              }
+            >
+              Cerrar
+            </button>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL FINAL */}
       {gameStatus !== "playing" && (
+
         <div className="modal-overlay">
 
           <div className="modal">
@@ -492,6 +702,7 @@ export default function App() {
             </h2>
 
             {gameStatus === "lost" && (
+
               <p>
                 La palabra era:{" "}
                 {secretWord}

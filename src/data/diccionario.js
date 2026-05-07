@@ -167,6 +167,7 @@ export const WORDS = [
 
   //    4 LETRAS
   { word: "AZUL", category: "random" },
+  { word: "ARCO", category: "random" },
   { word: "BOLA", category: "random" },
   { word: "CASA", category: "random" },
   { word: "DADO", category: "random" },
@@ -177,6 +178,7 @@ export const WORDS = [
   { word: "AUDIO", category: "random" },
   { word: "BARCO", category: "random" },
   { word: "CABLE", category: "random" },
+  { word: "CASCO", category: "random" },
   { word: "DATOS", category: "random" },
   { word: "FUEGO", category: "random" },
   { word: "HIELO", category: "random" },

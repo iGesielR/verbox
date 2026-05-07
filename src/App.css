@@ -580,3 +580,110 @@ body {
     opacity: 1;
   }
 }
+
+/* ===== PISTAS ===== */
+
+.hint-container {
+  position: absolute;
+  left: -130px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 4px;
+}
+
+.hint-button {
+  background: rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  color: white;
+
+  padding: 10px 14px;
+
+  border-radius: 18px;
+
+  font-size: 0.9rem;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.hint-button:hover {
+  transform: scale(1.05);
+}
+
+.hint-count {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.hint-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0,0,0,0.6);
+
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+.hint-modal {
+  background: rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(24px);
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  padding: 25px;
+
+  border-radius: 24px;
+
+  width: 320px;
+
+  color: white;
+
+  text-align: center;
+}
+
+.hint-board {
+  display: flex;
+  justify-content: center;
+
+  gap: 8px;
+
+  margin: 20px 0;
+}
+
+.hint-cell {
+  width: 50px;
+  height: 50px;
+}
+
+.revealed-letters {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.revealed-letter {
+  background: rgba(255,255,255,0.08);
+
+  padding: 10px;
+
+  border-radius: 12px;
+}
