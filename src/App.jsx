@@ -14,57 +14,72 @@ const THEME_EMOJIS = {
   random: "🎲",
 };
 
-// para Obtener palabras por longitud
+// Obtener palabras por longitud
 function getWordsByLength(length) {
   return WORDS.filter((w) => w.word.length === length);
 }
 
 export default function App() {
   const [wordLength, setWordLength] = useState(5);
-  const [showDifficultyMenu, setShowDifficultyMenu] = useState(false);
+  const [showDifficultyMenu, setShowDifficultyMenu] =
+    useState(false);
 
   const [theme, setTheme] = useState("");
   const [secretWord, setSecretWord] = useState("");
 
-  const [guesses, setGuesses] = useState(Array(MAX_ROWS).fill(""));
+  const [guesses, setGuesses] = useState(
+    Array(MAX_ROWS).fill("")
+  );
+
   const [currentRow, setCurrentRow] = useState(0);
 
-  const [gameStatus, setGameStatus] = useState("playing");
+  const [gameStatus, setGameStatus] =
+    useState("playing");
+
   const [usedKeys, setUsedKeys] = useState({});
 
-  const [flipRow, setFlipRow] = useState(null);
+  // AHORA GUARDA CELDA INDIVIDUAL
+  const [revealedCells, setRevealedCells] = useState([]);
+  const [flipCell, setFlipCell] = useState(null);
+
   const [errorRow, setErrorRow] = useState(null);
 
   const keySoundRef = useRef(null);
   const enterSoundRef = useRef(null);
 
-  //  palabras filtradas por dificultad
-  const wordsByLength = getWordsByLength(wordLength);
+  // Palabras según dificultad
+  const wordsByLength =
+    getWordsByLength(wordLength);
 
-  const VALID_WORDS = wordsByLength.map((w) => w.word);
-  const VALID_WORDS_SET = new Set(VALID_WORDS);
+  const VALID_WORDS =
+    wordsByLength.map((w) => w.word);
 
-  //  temas automáticos
-  const WORDS_BY_THEME = wordsByLength.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
+  const VALID_WORDS_SET =
+    new Set(VALID_WORDS);
 
-    acc[item.category].push(item.word);
+  // Temas automáticos
+  const WORDS_BY_THEME =
+    wordsByLength.reduce((acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
 
-    return acc;
-  }, {});
+      acc[item.category].push(item.word);
 
-  //  tema random
+      return acc;
+    }, {});
+
+  // Tema random
   function getRandomTheme() {
-    const themes = Object.keys(WORDS_BY_THEME);
+    const themes =
+      Object.keys(WORDS_BY_THEME);
 
     return themes[
       Math.floor(Math.random() * themes.length)
     ];
   }
 
-  //  palabra random por tema
+  // Palabra random por tema
   function getWordByTheme(theme) {
     const words = WORDS_BY_THEME[theme];
 
@@ -73,39 +88,50 @@ export default function App() {
     ];
   }
 
-  //  sonidos
+  // SONIDOS
   useEffect(() => {
-    keySoundRef.current = new Audio("/sonidos/key.wav");
-    enterSoundRef.current = new Audio("/sonidos/enter.mp3");
+    keySoundRef.current =
+      new Audio("/sonidos/key.wav");
+
+    enterSoundRef.current =
+      new Audio("/sonidos/enter.mp3");
 
     keySoundRef.current.volume = 1;
     enterSoundRef.current.volume = 1;
   }, []);
 
-  //  iniciar / cambiar dificultad
+  // INICIAR JUEGO
   useEffect(() => {
-    const themes = Object.keys(WORDS_BY_THEME);
+    const themes =
+      Object.keys(WORDS_BY_THEME);
 
     if (themes.length === 0) return;
 
     const randomTheme =
-      themes[Math.floor(Math.random() * themes.length)];
+      themes[
+        Math.floor(Math.random() * themes.length)
+      ];
 
-    const words = WORDS_BY_THEME[randomTheme];
+    const words =
+      WORDS_BY_THEME[randomTheme];
 
     const randomWord =
-      words[Math.floor(Math.random() * words.length)];
+      words[
+        Math.floor(Math.random() * words.length)
+      ];
 
     setTheme(randomTheme);
     setSecretWord(randomWord);
 
     setGuesses(Array(MAX_ROWS).fill(""));
     setCurrentRow(0);
+
     setGameStatus("playing");
+
     setUsedKeys({});
   }, [wordLength]);
 
-  // 
+  // Sonidos
   const playSound = (type) => {
     const baseSound =
       type === "enter"
@@ -114,36 +140,50 @@ export default function App() {
 
     if (!baseSound) return;
 
-    const soundClone = baseSound.cloneNode();
+    const soundClone =
+      baseSound.cloneNode();
 
-    soundClone.volume = baseSound.volume;
+    soundClone.volume =
+      baseSound.volume;
+
     soundClone.play();
   };
 
-  // 
+  // TECLADO FISICO
   useEffect(() => {
     const handleKey = (e) => {
-      handleKeyPress(e.key.toUpperCase());
+      handleKeyPress(
+        e.key.toUpperCase()
+      );
     };
 
-    window.addEventListener("keydown", handleKey);
+    window.addEventListener(
+      "keydown",
+      handleKey
+    );
 
     return () =>
-      window.removeEventListener("keydown", handleKey);
+      window.removeEventListener(
+        "keydown",
+        handleKey
+      );
   });
 
-  
+  // TECLAS
   function handleKeyPress(key) {
     if (gameStatus !== "playing") return;
 
-    // letras
+    // LETRAS
     if (/^[A-Z]$/.test(key)) {
       playSound("key");
 
       setGuesses((prev) => {
         const newGuesses = [...prev];
 
-        if (newGuesses[currentRow].length < wordLength) {
+        if (
+          newGuesses[currentRow].length <
+          wordLength
+        ) {
           newGuesses[currentRow] += key;
         }
 
@@ -151,8 +191,11 @@ export default function App() {
       });
     }
 
-    // borrar
-    if (key === "BACKSPACE" || key === "⌫") {
+    // BORRAR
+    if (
+      key === "BACKSPACE" ||
+      key === "⌫"
+    ) {
       playSound("key");
 
       setGuesses((prev) => {
@@ -167,14 +210,23 @@ export default function App() {
 
     // ENTER
     if (key === "ENTER") {
-      const currentGuess = guesses[currentRow];
+      const currentGuess =
+        guesses[currentRow];
 
       if (!currentGuess) return;
 
-      if (currentGuess.length !== wordLength) return;
+      if (
+        currentGuess.length !==
+        wordLength
+      )
+        return;
 
-      //  palabra inválida
-      if (!VALID_WORDS_SET.has(currentGuess)) {
+      // INVALIDA
+      if (
+        !VALID_WORDS_SET.has(
+          currentGuess
+        )
+      ) {
         setErrorRow(currentRow);
 
         setTimeout(() => {
@@ -186,84 +238,129 @@ export default function App() {
 
       playSound("enter");
 
-      setFlipRow(currentRow);
+      // FLIP LETRA POR LETRA
+      currentGuess
+      .split("")
+      .forEach((_, i) => {
+        setTimeout(() => {
+
+          setFlipCell(`${currentRow}-${i}`);
+
+          setRevealedCells(prev => [
+            ...prev,
+            `${currentRow}-${i}`
+          ]);
+
+        }, i * 180);
+      });
 
       setTimeout(() => {
-        const newUsed = { ...usedKeys };
+        const newUsed = {
+          ...usedKeys,
+        };
 
-        currentGuess.split("").forEach((letter, i) => {
-          const status = getLetterStatus(letter, i);
+        currentGuess
+          .split("")
+          .forEach((letter, i) => {
+            const status =
+              getLetterStatus(
+                letter,
+                i
+              );
 
-          if (status === "correct") {
-            newUsed[letter] = "correct";
-          } else if (
-            status === "present" &&
-            newUsed[letter] !== "correct"
-          ) {
-            newUsed[letter] = "present";
-          } else if (!newUsed[letter]) {
-            newUsed[letter] = "absent";
-          }
-        });
+            if (
+              status === "correct"
+            ) {
+              newUsed[letter] =
+                "correct";
+            } else if (
+              status === "present" &&
+              newUsed[letter] !==
+                "correct"
+            ) {
+              newUsed[letter] =
+                "present";
+            } else if (
+              !newUsed[letter]
+            ) {
+              newUsed[letter] =
+                "absent";
+            }
+          });
 
         setUsedKeys(newUsed);
 
-        // 🎉 ganar
-        if (currentGuess === secretWord) {
+        // GANAR
+        if (
+          currentGuess === secretWord
+        ) {
           setGameStatus("won");
-          setFlipRow(null);
           return;
         }
 
-        // 😢 perder
-        if (currentRow === MAX_ROWS - 1) {
+        // PERDER
+        if (
+          currentRow ===
+          MAX_ROWS - 1
+        ) {
           setGameStatus("lost");
-          setFlipRow(null);
           return;
         }
 
-        // siguiente fila
         setCurrentRow((r) => r + 1);
 
-        setFlipRow(null);
-      }, 200);
+        setFlipCell(null);
+      }, wordLength * 250 + 300);
     }
   }
 
-  //  estado letra
-  function getLetterStatus(letter, index) {
+  // ESTADO LETRA
+  function getLetterStatus(
+    letter,
+    index
+  ) {
     if (!letter) return "";
 
-    if (letter === secretWord[index]) {
+    if (
+      letter === secretWord[index]
+    ) {
       return "correct";
     }
 
-    if (secretWord.includes(letter)) {
+    if (
+      secretWord.includes(letter)
+    ) {
       return "present";
     }
 
     return "absent";
   }
 
-  //  reiniciar
+  // RESET
   function resetGame() {
-    const randomTheme = getRandomTheme();
+    const randomTheme =
+      getRandomTheme();
 
     const randomWord =
       getWordByTheme(randomTheme);
 
     setTheme(randomTheme);
+
     setSecretWord(randomWord);
 
     setGuesses(Array(MAX_ROWS).fill(""));
+
     setCurrentRow(0);
 
     setGameStatus("playing");
 
     setUsedKeys({});
+
+    setFlipCell(null);
+
+    setRevealedCells([]);
   }
 
-  //  
   if (!secretWord) return null;
 
   return (
@@ -271,9 +368,11 @@ export default function App() {
 
       {/* TOP BAR */}
       <div className="top-bar">
+
         <h1>VerBoX</h1>
 
         <div className="difficulty-container">
+
           <button
             className="difficulty-button"
             onClick={() =>
@@ -328,7 +427,9 @@ export default function App() {
 
       {/* TABLERO */}
       <div className="board">
+
         {guesses.map((guess, rowIndex) => (
+
           <div
             key={rowIndex}
             className={`row ${
@@ -337,9 +438,11 @@ export default function App() {
                 : ""
             }`}
           >
+
             {Array.from({
               length: wordLength,
             }).map((_, colIndex) => {
+
               const letter =
                 guess[colIndex];
 
@@ -347,21 +450,20 @@ export default function App() {
                 <div
                   key={colIndex}
                   className={`cell ${
-                    rowIndex < currentRow ||
-                    gameStatus !== "playing"
+                    revealedCells.includes(
+                      `${rowIndex}-${colIndex}`
+                    )
                       ? getLetterStatus(
                           letter,
                           colIndex
                         )
                       : ""
                   } ${
-                    flipRow === rowIndex
+                    flipCell ===
+                    `${rowIndex}-${colIndex}`
                       ? "flip"
                       : ""
                   }`}
-                  style={{
-                    animationDelay: `${colIndex * 0.2}s`,
-                  }}
                 >
                   {letter || ""}
                 </div>
@@ -380,6 +482,7 @@ export default function App() {
       {/* MODAL */}
       {gameStatus !== "playing" && (
         <div className="modal-overlay">
+
           <div className="modal">
 
             <h2>

@@ -81,6 +81,7 @@ export const WORDS = [
   { word: "SUSTO", category: "terror" },
   { word: "DAGAS", category: "terror" },
   { word: "MUCHO", category: "terror" }, 
+  { word: "MIEDO", category: "terror" }, 
   { word: "HUESO" , category: "terror" },
   { word: "NOCHE", category: "terror" },
   { word: "MALOS", category: "terror" },
@@ -172,6 +173,9 @@ export const WORDS = [
   { word: "FOCO", category: "random" },
 
   //    5 LETRAS
+  { word: "ARBOL", category: "random" },
+  { word: "AUDIO", category: "random" },
+  { word: "BARCO", category: "random" },
   { word: "CABLE", category: "random" },
   { word: "DATOS", category: "random" },
   { word: "FUEGO", category: "random" },
