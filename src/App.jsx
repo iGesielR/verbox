@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "./App.css";
-import Keyboard from "./componentes/teclado";
+import Keyboard from "./componentes/Teclado";
 import { WORDS } from "./data/diccionario";
 
 const MAX_ROWS = 6;
