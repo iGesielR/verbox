@@ -17,6 +17,7 @@ export const WORDS = [
   { word: "DATIL", category: "frutas" },
   { word: "MORAS", category: "frutas" },
   { word: "MAMEY", category: "frutas" },
+  { word: "MANGO", category: "frutas" },
   { word: "ANONA", category: "frutas" },
   { word: "MALTA", category: "frutas" },
 
