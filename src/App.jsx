@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "./App.css";
-import Keyboard from "./componentes/Teclado";
+import Keyboard from "./componentes/teclado";
 import { WORDS } from "./data/diccionario";
 
 const MAX_ROWS = 6;
@@ -11,8 +11,6 @@ const THEME_EMOJIS = {
   terror: "👻",
   emociones: "🎭",
   lugares: "🏝️",
-  espacio: "🚀",
-  naturaleza: "🌿",
   random: "🎲",
 };
 

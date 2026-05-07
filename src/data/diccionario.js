@@ -10,7 +10,6 @@ export const WORDS = [
   { word: "KIWI", category: "frutas" }, 
             
             // 5 LETRAS
-  { word: "PIÑAS", category: "frutas" },
   { word: "COCOS", category: "frutas" },
   { word: "LIMAS", category: "frutas" },
   { word: "PERAS", category: "frutas" },
